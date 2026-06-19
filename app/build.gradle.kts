@@ -69,5 +69,17 @@ dependencies {
 
     implementation(libs.coil.compose)
 
+    // CameraX
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // MediaPipe Tasks Vision — on-device image embedder
+    implementation(libs.mediapipe.tasks.vision)
+
+    // Accompanist Permissions — runtime camera permission handling
+    implementation(libs.accompanist.permissions)
+
     debugImplementation(libs.androidx.ui.tooling)
 }

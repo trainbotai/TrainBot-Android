@@ -33,4 +33,43 @@
 
     <!-- Placeholder screens -->
     <string name="coming_soon">În curând…</string>
+
+    <!-- Training screen -->
+    <string name="training_title">Antrenează</string>
+    <string name="training_new_project">Proiect nou</string>
+    <string name="training_no_projects">Niciun proiect. Creează primul!</string>
+    <string name="training_labels_count">%d etichete</string>
+    <string name="training_new_label">+ Etichetă nouă</string>
+    <string name="training_add_photos">Adaugă poze</string>
+    <string name="training_photos_count">%d poze</string>
+    <string name="training_train_button">Antrenează!</string>
+    <string name="training_training_in_progress">Antrenez…</string>
+    <string name="training_bot_learned">Bot-ul tău e %d%% inteligent!</string>
+    <string name="training_error_min_labels">Adaugă cel puțin 2 etichete.</string>
+    <string name="training_error_min_images">Eticheta \'%1$s\' are doar %2$d poze. Adaugă minim 3.</string>
+    <string name="training_error_generic">Antrenarea a eșuat: %s</string>
+    <string name="training_new_project_hint">ex. Pisici și câini</string>
+    <string name="training_new_label_hint">ex. Pisică</string>
+    <string name="training_dialog_ok">OK</string>
+    <string name="training_back">Înapoi</string>
+    <string name="training_camera_button">Fă o poză</string>
+    <string name="training_gallery_button">Din galerie</string>
+    <string name="training_camera_permission_rationale">Avem nevoie de cameră pentru a face poze pentru antrenare.</string>
+    <string name="training_preparing">Se pregătește…</string>
+    <string name="training_computing">Se calculează reprezentările…</string>
+    <string name="training_saving">Se salvează modelul…</string>
+
+    <!-- Testing screen -->
+    <string name="testing_title">Testează</string>
+    <string name="testing_no_models">Nu ai niciun model antrenat încă.\nMergi la Antrenează și creează primul!</string>
+    <string name="testing_choose_model">Alege ce model vrei să testezi:</string>
+    <string name="testing_pick_image">Alege poza</string>
+    <string name="testing_another_image">Altă poză</string>
+    <string name="testing_thinking">Mă gândesc…</string>
+    <string name="testing_result_label">Cred că e:</string>
+    <string name="testing_result_confidence">%d%% sigur</string>
+    <string name="testing_back">Înapoi</string>
+    <string name="testing_camera_button">Fă o poză</string>
+    <string name="testing_gallery_button">Din galerie</string>
+    <string name="testing_model_not_ready">Modelul nu este gata. Antrenează mai întâi.</string>
 </resources>

@@ -3,6 +3,7 @@ package com.luca.trainbot.core.di
 import android.content.Context
 import com.luca.trainbot.core.data.AuthRepository
 import com.luca.trainbot.core.data.TokenStore
+import com.luca.trainbot.core.ml.MlProjectRepository
 import com.luca.trainbot.core.network.NetworkModule
 
 /**
@@ -19,4 +20,7 @@ class AppContainer(context: Context) {
     private val authApiService = NetworkModule.buildAuthApiService(retrofit)
 
     val authRepository = AuthRepository(authApiService, tokenStore)
+
+    /** Shared ML project repository — single instance so file writes don't race. */
+    val mlProjectRepository = MlProjectRepository(context)
 }
