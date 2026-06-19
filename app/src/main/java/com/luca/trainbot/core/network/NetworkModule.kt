@@ -9,12 +9,14 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 /**
- * Builds the shared OkHttpClient and Retrofit instance.
- * The [authInterceptor] parameter is set from AppContainer once tokens are available,
- * allowing future phases to attach the Bearer token automatically.
+ * Builds the shared OkHttpClient and Retrofit instances.
  *
- * SSE support will be added in a later phase via OkHttp EventSource — the client
- * is structured to support it (no special restrictions on streaming).
+ * Two clients are created:
+ * - [buildOkHttpClient] — unauthenticated, used for auth endpoints.
+ * - [buildAuthenticatedClient] — includes [AuthInterceptor] for all student/LLM calls.
+ *
+ * SSE streaming is handled via raw OkHttp (using the authenticated client) in
+ * [LlmStreamingRepository] — Retrofit cannot stream SSE responses.
  */
 object NetworkModule {
 
@@ -36,6 +38,20 @@ object NetworkModule {
             .build()
     }
 
+    fun buildAuthenticatedClient(tokenProvider: () -> String?): OkHttpClient {
+        val logging = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(tokenProvider))
+            .addInterceptor(logging)
+            .build()
+    }
+
     fun buildRetrofit(client: OkHttpClient): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
@@ -47,4 +63,7 @@ object NetworkModule {
 
     fun buildAuthApiService(retrofit: Retrofit): AuthApiService =
         retrofit.create(AuthApiService::class.java)
+
+    fun buildLlmApiService(retrofit: Retrofit): LlmApiService =
+        retrofit.create(LlmApiService::class.java)
 }

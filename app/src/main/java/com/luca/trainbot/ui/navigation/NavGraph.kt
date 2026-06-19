@@ -8,6 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.luca.trainbot.core.data.AuthRepository
 import com.luca.trainbot.core.data.AuthState
+import com.luca.trainbot.core.network.LlmRepository
+import com.luca.trainbot.core.network.LlmStreamingRepository
 import com.luca.trainbot.feature.auth.StudentLoginScreen
 import com.luca.trainbot.feature.home.HomeScreen
 import com.luca.trainbot.feature.knowledge.KnowledgeScreen
@@ -27,7 +29,11 @@ object Routes {
 }
 
 @Composable
-fun TrainBotNavGraph(authRepository: AuthRepository) {
+fun TrainBotNavGraph(
+    authRepository: AuthRepository,
+    llmRepository: LlmRepository,
+    llmStreamingRepository: LlmStreamingRepository,
+) {
     val navController = rememberNavController()
     val authState by authRepository.authState.collectAsState(initial = AuthState.Unauthenticated)
 
@@ -59,7 +65,13 @@ fun TrainBotNavGraph(authRepository: AuthRepository) {
         }
         composable(Routes.TRAINING) { TrainingScreen() }
         composable(Routes.TESTING) { TestingScreen() }
-        composable(Routes.LLM) { LlmScreen() }
+        composable(Routes.LLM) {
+            LlmScreen(
+                llmRepository = llmRepository,
+                llmStreamingRepository = llmStreamingRepository,
+                onBack = { navController.popBackStack() },
+            )
+        }
         composable(Routes.KNOWLEDGE) { KnowledgeScreen() }
         composable(Routes.SETTINGS) {
             SettingsScreen(

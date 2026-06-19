@@ -21,7 +21,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             TrainBotTheme {
                 Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
-                    TrainBotNavGraph(authRepository = container.authRepository)
+                    TrainBotNavGraph(
+                        authRepository = container.authRepository,
+                        llmRepository = container.llmRepository,
+                        llmStreamingRepository = container.llmStreamingRepository,
+                    )
                 }
             }
         }
