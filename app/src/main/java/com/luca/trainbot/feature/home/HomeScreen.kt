@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
@@ -176,7 +177,13 @@ private fun FeatureCards(onNavigate: (String) -> Unit) {
             title = stringResource(R.string.nav_daily_challenge_title),
             subtitle = stringResource(R.string.nav_daily_challenge_subtitle),
             icon = Icons.Default.AutoAwesome,
-            onClick = { /* Coming soon */ },
+            onClick = { onNavigate(Routes.DAILY_CHALLENGE) },
+        )
+        NavigationCard(
+            title = stringResource(R.string.nav_achievements_title),
+            subtitle = stringResource(R.string.nav_achievements_subtitle),
+            icon = Icons.Default.EmojiEvents,
+            onClick = { onNavigate(Routes.ACHIEVEMENTS) },
         )
     }
 }

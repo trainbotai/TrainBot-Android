@@ -25,6 +25,10 @@ class MainActivity : ComponentActivity() {
                         authRepository = container.authRepository,
                         llmRepository = container.llmRepository,
                         llmStreamingRepository = container.llmStreamingRepository,
+                        mlProjectRepository = container.mlProjectRepository,
+                        onboardingStore = container.onboardingStore,
+                        achievementsStore = container.achievementsStore,
+                        dailyChallengeStore = container.dailyChallengeStore,
                     )
                 }
             }

@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.luca.trainbot.BuildConfig
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Authenticator
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -38,7 +39,10 @@ object NetworkModule {
             .build()
     }
 
-    fun buildAuthenticatedClient(tokenProvider: () -> String?): OkHttpClient {
+    fun buildAuthenticatedClient(
+        tokenProvider: () -> String?,
+        authenticator: Authenticator? = null,
+    ): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
@@ -48,6 +52,7 @@ object NetworkModule {
         }
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(tokenProvider))
+            .apply { if (authenticator != null) authenticator(authenticator) }
             .addInterceptor(logging)
             .build()
     }

@@ -30,6 +30,8 @@
     <string name="nav_daily_challenge_subtitle">Câștigă XP rezolvând task-ul</string>
     <string name="nav_settings_title">Setări</string>
     <string name="nav_settings_subtitle">Cont și preferințe</string>
+    <string name="nav_achievements_title">Realizări</string>
+    <string name="nav_achievements_subtitle">Badge-uri și XP câștigate</string>
 
     <!-- Placeholder screens -->
     <string name="coming_soon">În curând…</string>
