@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme — Compose handles all Material 3 theming.
+         Theme.Material.Light.NoActionBar is always present on API 21+. -->
+    <style name="Theme.TrainBot" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.TrainBot.NoActionBar" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

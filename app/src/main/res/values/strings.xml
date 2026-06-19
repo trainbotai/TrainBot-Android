@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TrainBot</string>
+
+    <!-- Auth -->
+    <string name="login_welcome">Bun venit!</string>
+    <string name="login_subtitle">Intră în clasa ta TrainBot</string>
+    <string name="login_class_code_hint">Codul clasei (ex: AB-12CD)</string>
+    <string name="login_username_hint">Utilizator</string>
+    <string name="login_password_hint">Parolă</string>
+    <string name="login_button">Intră</string>
+    <string name="login_loading">Se conectează…</string>
+    <string name="login_error_empty_fields">Completează toate câmpurile</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Salut!</string>
+    <string name="home_mascot_title">Bot-ul tău e gata!</string>
+    <string name="home_mascot_subtitle">Antrenează-l să recunoască lucruri noi.</string>
+
+    <!-- Nav cards -->
+    <string name="nav_training_title">Antrenează</string>
+    <string name="nav_training_subtitle">Adaugă poze și învață AI-ul</string>
+    <string name="nav_llm_title">AI-ul tău</string>
+    <string name="nav_llm_subtitle">Antrenează-ți boții și conversează cu ei</string>
+    <string name="nav_testing_title">Testează</string>
+    <string name="nav_testing_subtitle">Vezi cât de bine recunoaște</string>
+    <string name="nav_knowledge_title">Cunoștințe</string>
+    <string name="nav_knowledge_subtitle">Toate pozele învățate</string>
+    <string name="nav_daily_challenge_title">Provocarea zilei</string>
+    <string name="nav_daily_challenge_subtitle">Câștigă XP rezolvând task-ul</string>
+    <string name="nav_settings_title">Setări</string>
+    <string name="nav_settings_subtitle">Cont și preferințe</string>
+
+    <!-- Placeholder screens -->
+    <string name="coming_soon">În curând…</string>
+</resources>
