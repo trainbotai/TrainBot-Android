@@ -3,11 +3,9 @@ package com.luca.trainbot.core.ml
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.mediapipe.framework.image.BitmapImageBuilder
-import com.google.mediapipe.tasks.components.containers.Embedding
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.imageembedder.ImageEmbedder as MediaPipeImageEmbedder
-import java.util.Optional
 
 /**
  * Wraps MediaPipe ImageEmbedder (MobileNet V3 Small model bundled in assets).
@@ -44,9 +42,16 @@ class ImageEmbedder(context: Context) {
      * Both must be float embeddings from the same model.
      */
     fun cosineSimilarity(a: FloatArray, b: FloatArray): Double {
-        val embA = Embedding.create(a, null, 0, Optional.empty())
-        val embB = Embedding.create(b, null, 0, Optional.empty())
-        return MediaPipeImageEmbedder.cosineSimilarity(embA, embB)
+        var dot = 0.0
+        var normA = 0.0
+        var normB = 0.0
+        for (i in a.indices) {
+            dot += a[i] * b[i]
+            normA += a[i] * a[i]
+            normB += b[i] * b[i]
+        }
+        val denom = Math.sqrt(normA) * Math.sqrt(normB)
+        return if (denom == 0.0) 0.0 else dot / denom
     }
 
     fun close() = embedder.close()

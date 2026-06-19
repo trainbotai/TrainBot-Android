@@ -32,6 +32,7 @@ class MlProjectRepository(private val context: Context) {
         }.getOrDefault(emptyList())
     }
 
+    @Synchronized
     fun saveProject(project: MlProject) {
         val projects = loadAllProjects().toMutableList()
         val idx = projects.indexOfFirst { it.id == project.id }
@@ -39,12 +40,14 @@ class MlProjectRepository(private val context: Context) {
         projectsFile.writeText(json.encodeToString(projects))
     }
 
+    @Synchronized
     fun createProject(name: String): MlProject {
         val project = MlProject(id = UUID.randomUUID().toString(), name = name)
         saveProject(project)
         return project
     }
 
+    @Synchronized
     fun deleteProject(projectId: String) {
         val projects = loadAllProjects().toMutableList()
         projects.removeAll { it.id == projectId }
@@ -55,6 +58,7 @@ class MlProjectRepository(private val context: Context) {
 
     // ── Labels ───────────────────────────────────────────────────────────────
 
+    @Synchronized
     fun addLabel(projectId: String, name: String): MlProject {
         val project = loadProject(projectId) ?: error("Project not found: $projectId")
         val label = MlLabel(id = UUID.randomUUID().toString(), name = name)
@@ -67,6 +71,7 @@ class MlProjectRepository(private val context: Context) {
         return updated
     }
 
+    @Synchronized
     fun deleteLabel(projectId: String, labelId: String): MlProject {
         val project = loadProject(projectId) ?: error("Project not found: $projectId")
         project.labels.find { it.id == labelId }?.imageFileNames?.forEach { fn ->
@@ -83,6 +88,7 @@ class MlProjectRepository(private val context: Context) {
 
     // ── Images ───────────────────────────────────────────────────────────────
 
+    @Synchronized
     fun addImage(projectId: String, labelId: String, bitmap: Bitmap): MlProject {
         val project = loadProject(projectId) ?: error("Project not found: $projectId")
         val filename = "${UUID.randomUUID()}.jpg"
@@ -102,6 +108,7 @@ class MlProjectRepository(private val context: Context) {
         return updated
     }
 
+    @Synchronized
     fun addImageFromUri(projectId: String, labelId: String, uri: Uri): MlProject {
         val bitmap = context.contentResolver.openInputStream(uri)?.use { stream ->
             BitmapFactory.decodeStream(stream)
@@ -109,6 +116,7 @@ class MlProjectRepository(private val context: Context) {
         return addImage(projectId, labelId, bitmap)
     }
 
+    @Synchronized
     fun deleteImage(projectId: String, labelId: String, filename: String): MlProject {
         imageFile(projectId, labelId, filename).delete()
         val project = loadProject(projectId) ?: error("Project not found: $projectId")
@@ -130,6 +138,7 @@ class MlProjectRepository(private val context: Context) {
     // ── Model (embeddings) persistence ───────────────────────────────────────
 
     /** Save the trained project (with centroids) back to the store. */
+    @Synchronized
     fun saveTrainedProject(project: MlProject) {
         saveProject(project.copy(isTrained = true, updatedAt = System.currentTimeMillis()))
     }
