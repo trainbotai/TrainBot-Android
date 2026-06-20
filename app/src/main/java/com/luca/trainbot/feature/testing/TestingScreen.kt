@@ -77,7 +77,11 @@ fun TestingScreen() {
     val context = LocalContext.current
     val app = context.applicationContext as TrainBotApplication
     val vm: TestingViewModel = viewModel(
-        factory = TestingViewModel.Factory(app.container.mlProjectRepository, context),
+        factory = TestingViewModel.Factory(
+            app.container.mlProjectRepository,
+            context,
+            app.container.achievementsStore,
+        ),
     )
     val state by vm.state.collectAsState()
 

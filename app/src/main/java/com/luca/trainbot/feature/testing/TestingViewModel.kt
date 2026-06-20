@@ -10,6 +10,7 @@ import com.luca.trainbot.core.ml.ClassifierPrediction
 import com.luca.trainbot.core.ml.ImageClassifier
 import com.luca.trainbot.core.ml.MlProject
 import com.luca.trainbot.core.ml.MlProjectRepository
+import com.luca.trainbot.feature.achievements.AchievementsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +31,7 @@ data class TestingUiState(
 class TestingViewModel(
     private val repository: MlProjectRepository,
     private val context: Context,
+    private val achievementsStore: AchievementsStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TestingUiState())
@@ -62,6 +64,8 @@ class TestingViewModel(
                     _state.update { it.copy(isPredicting = false, error = "Modelul nu este gata. Antrenează mai întâi.") }
                 } else {
                     _state.update { it.copy(isPredicting = false, prediction = result) }
+                    // Achievement: first_test (target=1)
+                    achievementsStore.incrementProgress("first_test")
                 }
             }.onFailure { e ->
                 _state.update { it.copy(isPredicting = false, error = e.message) }
@@ -94,9 +98,10 @@ class TestingViewModel(
     class Factory(
         private val repository: MlProjectRepository,
         private val context: Context,
+        private val achievementsStore: AchievementsStore,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            TestingViewModel(repository, context) as T
+            TestingViewModel(repository, context, achievementsStore) as T
     }
 }

@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.luca.trainbot.core.network.LlmRepository
 import com.luca.trainbot.core.network.LlmStreamingRepository
+import com.luca.trainbot.feature.achievements.AchievementsStore
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.Danger
 import com.luca.trainbot.ui.theme.PrimaryPurple
@@ -74,9 +75,10 @@ fun ChatScreen(
     sessionName: String,
     repo: LlmRepository,
     streaming: LlmStreamingRepository,
+    achievementsStore: AchievementsStore,
     onBack: () -> Unit,
 ) {
-    val vm = remember(sessionId) { ChatViewModel(sessionId, sessionName, repo, streaming) }
+    val vm = remember(sessionId) { ChatViewModel(sessionId, sessionName, repo, streaming, achievementsStore) }
     var inputText by remember { mutableStateOf("") }
     var showReport by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()

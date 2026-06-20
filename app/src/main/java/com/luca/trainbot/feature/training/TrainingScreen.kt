@@ -83,7 +83,12 @@ fun TrainingScreen() {
     val context = LocalContext.current
     val app = context.applicationContext as TrainBotApplication
     val vm: TrainingViewModel = viewModel(
-        factory = TrainingViewModel.Factory(app.container.mlProjectRepository, context),
+        factory = TrainingViewModel.Factory(
+            app.container.mlProjectRepository,
+            context,
+            app.container.achievementsStore,
+            app.container.mlSyncService,
+        ),
     )
     val state by vm.state.collectAsState()
 

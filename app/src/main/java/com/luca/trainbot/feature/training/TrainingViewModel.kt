@@ -10,6 +10,8 @@ import com.luca.trainbot.core.ml.ImageClassifier
 import com.luca.trainbot.core.ml.MlLabel
 import com.luca.trainbot.core.ml.MlProject
 import com.luca.trainbot.core.ml.MlProjectRepository
+import com.luca.trainbot.core.ml.MlSyncService
+import com.luca.trainbot.feature.achievements.AchievementsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +34,8 @@ data class TrainingUiState(
 class TrainingViewModel(
     private val repository: MlProjectRepository,
     private val context: Context,
+    private val achievementsStore: AchievementsStore,
+    private val mlSyncService: MlSyncService,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TrainingUiState())
@@ -52,6 +56,11 @@ class TrainingViewModel(
         val project = repository.createProject(name.trim())
         _state.update { it.copy(projects = repository.loadAllProjects()) }
         selectProject(project.id)
+        // Achievements: first_project (target=1), five_projects (target=5)
+        viewModelScope.launch {
+            achievementsStore.incrementProgress("first_project")
+            achievementsStore.incrementProgress("five_projects")
+        }
     }
 
     fun selectProject(projectId: String) {
@@ -80,6 +89,8 @@ class TrainingViewModel(
     fun addImageFromBitmap(projectId: String, labelId: String, bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
             val updated = repository.addImage(projectId, labelId, bitmap)
+            // Achievement: ten_images (target=10) — increment by 1 per image
+            achievementsStore.incrementProgress("ten_images", 1)
             withContext(Dispatchers.Main) {
                 _state.update { it.copy(selectedProject = updated) }
                 loadThumbnails(updated)
@@ -91,6 +102,8 @@ class TrainingViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val updated = repository.addImageFromUri(projectId, labelId, uri)
+                // Achievement: ten_images (target=10) — increment by 1 per image
+                achievementsStore.incrementProgress("ten_images", 1)
                 withContext(Dispatchers.Main) {
                     _state.update { it.copy(selectedProject = updated) }
                     loadThumbnails(updated)
@@ -128,6 +141,10 @@ class TrainingViewModel(
                     )
                 }
                 loadProjects()
+                // Achievement: first_train (target=1)
+                achievementsStore.incrementProgress("first_train")
+                // ML sync — fire-and-forget, does not throw
+                mlSyncService.syncProject(trained)
             }.onFailure { e ->
                 _state.update { it.copy(isTraining = false, trainProgress = null, error = e.message) }
             }
@@ -157,9 +174,11 @@ class TrainingViewModel(
     class Factory(
         private val repository: MlProjectRepository,
         private val context: Context,
+        private val achievementsStore: AchievementsStore,
+        private val mlSyncService: MlSyncService,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            TrainingViewModel(repository, context) as T
+            TrainingViewModel(repository, context, achievementsStore, mlSyncService) as T
     }
 }

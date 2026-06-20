@@ -71,4 +71,7 @@ object NetworkModule {
 
     fun buildLlmApiService(retrofit: Retrofit): LlmApiService =
         retrofit.create(LlmApiService::class.java)
+
+    fun buildMlApiService(retrofit: Retrofit): MlApiService =
+        retrofit.create(MlApiService::class.java)
 }

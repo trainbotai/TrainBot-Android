@@ -6,6 +6,7 @@ import com.luca.trainbot.core.data.AuthState
 import com.luca.trainbot.core.data.OnboardingStore
 import com.luca.trainbot.core.data.TokenStore
 import com.luca.trainbot.core.ml.MlProjectRepository
+import com.luca.trainbot.core.ml.MlSyncService
 import com.luca.trainbot.feature.achievements.AchievementsStore
 import com.luca.trainbot.feature.dailychallenge.DailyChallengeStore
 import com.luca.trainbot.core.network.LlmRepository
@@ -57,8 +58,10 @@ class AppContainer(context: Context) {
     )
     private val authenticatedRetrofit = NetworkModule.buildRetrofit(authenticatedClient)
     private val llmApiService = NetworkModule.buildLlmApiService(authenticatedRetrofit)
+    private val mlApiService = NetworkModule.buildMlApiService(authenticatedRetrofit)
 
     val llmRepository = LlmRepository(llmApiService)
+    val mlSyncService = MlSyncService(mlApiService)
 
     val llmStreamingRepository = LlmStreamingRepository(
         client = authenticatedClient,

@@ -127,6 +127,7 @@ fun TrainBotNavGraph(
             LlmScreen(
                 llmRepository = llmRepository,
                 llmStreamingRepository = llmStreamingRepository,
+                achievementsStore = achievementsStore,
                 onBack = { navController.popBackStack() },
             )
         }

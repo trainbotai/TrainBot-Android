@@ -13,6 +13,7 @@ import com.luca.trainbot.core.network.LlmStreamingRepository
 import com.luca.trainbot.core.network.QueryQuota
 import com.luca.trainbot.core.network.SseEvent
 import com.luca.trainbot.core.network.UnauthorizedException
+import com.luca.trainbot.feature.achievements.AchievementsStore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -35,6 +36,7 @@ class ChatViewModel(
     val sessionName: String,
     private val repo: LlmRepository,
     private val streaming: LlmStreamingRepository,
+    private val achievementsStore: AchievementsStore,
 ) : ViewModel() {
 
     var history by mutableStateOf<List<ChatHistoryItem>>(emptyList())
@@ -111,6 +113,8 @@ class ChatViewModel(
                         flagged = false,
                         createdAt = java.time.Instant.now().toString(),
                     )
+                    // Achievement: first_chat (target=1)
+                    achievementsStore.incrementProgress("first_chat")
                 }
                 pendingMessage = null
                 // Refresh quota

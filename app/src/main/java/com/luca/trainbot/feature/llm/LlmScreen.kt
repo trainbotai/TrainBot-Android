@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.luca.trainbot.core.network.LlmRepository
 import com.luca.trainbot.core.network.LlmStreamingRepository
 import com.luca.trainbot.core.network.QueryQuota
+import com.luca.trainbot.feature.achievements.AchievementsStore
 import com.luca.trainbot.core.network.SessionSummary
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.Danger
@@ -62,6 +63,7 @@ import com.luca.trainbot.ui.theme.SecondaryPurple
 fun LlmScreen(
     llmRepository: LlmRepository,
     llmStreamingRepository: LlmStreamingRepository,
+    achievementsStore: AchievementsStore,
     onBack: (() -> Unit)? = null,
 ) {
     val vm = remember { BotListViewModel(llmRepository) }
@@ -92,6 +94,7 @@ fun LlmScreen(
             sessionName = s.sessionName,
             repo = llmRepository,
             streaming = llmStreamingRepository,
+            achievementsStore = achievementsStore,
             onBack = { screen = LlmSubScreen.List },
         )
     }
