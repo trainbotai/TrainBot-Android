@@ -25,7 +25,7 @@ android {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("String", "BASE_URL", "\"https://api.trainbot.moldluca.tech/api/v1/\"")
+            buildConfigField("String", "BASE_URL", "\"https://api.trainbot.moldluca.tech:33443/api/v1/\"")
             manifestPlaceholders["usesCleartextTraffic"] = "false"
         }
     }
