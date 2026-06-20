@@ -49,6 +49,8 @@ import com.luca.trainbot.core.network.LlmStreamingRepository
 import com.luca.trainbot.core.network.QueryQuota
 import com.luca.trainbot.feature.achievements.AchievementsStore
 import com.luca.trainbot.core.network.SessionSummary
+import com.luca.trainbot.ui.components.Mascot
+import com.luca.trainbot.ui.components.MascotState
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.Danger
 import com.luca.trainbot.ui.theme.PrimaryPurple
@@ -285,7 +287,7 @@ private fun EmptyBotState() {
                 .background(Brush.linearGradient(listOf(PrimaryPurple, AccentBlue))),
             contentAlignment = Alignment.Center,
         ) {
-            Text(text = "🤖", style = MaterialTheme.typography.headlineLarge)
+            Mascot(state = MascotState.IDLE, size = 70.dp)
         }
         Text(
             text = "Niciun bot inca",

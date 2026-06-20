@@ -33,6 +33,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -61,11 +62,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import androidx.compose.foundation.shape.CircleShape
 import com.luca.trainbot.R
 import com.luca.trainbot.TrainBotApplication
 import com.luca.trainbot.core.ml.ClassifierPrediction
 import com.luca.trainbot.core.ml.MlProject
 import com.luca.trainbot.ui.components.CameraCapture
+import com.luca.trainbot.ui.components.Mascot
+import com.luca.trainbot.ui.components.MascotState
+import com.luca.trainbot.ui.components.rememberHaptic
+import com.luca.trainbot.ui.components.rememberHapticConfirm
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.PrimaryPurple
 import com.luca.trainbot.ui.theme.Success
@@ -176,11 +182,11 @@ private fun ProjectChooser(
                 Box(
                     modifier = Modifier
                         .size(80.dp)
-                        .clip(RoundedCornerShape(40.dp))
+                        .clip(CircleShape)
                         .background(Brush.linearGradient(listOf(PrimaryPurple, AccentBlue))),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("🤔", style = MaterialTheme.typography.headlineLarge)
+                    Mascot(state = MascotState.CONFUSED, size = 70.dp)
                 }
                 Text(
                     text = stringResource(R.string.testing_no_models),
@@ -241,6 +247,7 @@ private fun TesterPanel(
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
 ) {
+    val haptic = rememberHaptic()
     Row(verticalAlignment = Alignment.CenterVertically) {
         TextButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = null)
@@ -284,11 +291,11 @@ private fun TesterPanel(
                     Box(
                         modifier = Modifier
                             .size(100.dp)
-                            .clip(RoundedCornerShape(50.dp))
+                            .clip(CircleShape)
                             .background(Brush.linearGradient(listOf(PrimaryPurple, AccentBlue))),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text("🤔", style = MaterialTheme.typography.displayMedium)
+                        Mascot(state = MascotState.THINKING, size = 90.dp)
                     }
                     Text(
                         text = stringResource(R.string.testing_thinking),
@@ -320,7 +327,7 @@ private fun TesterPanel(
     val hasImage = state.testImage != null
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedButton(
-            onClick = onCameraClick,
+            onClick = { haptic(); onCameraClick() },
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(12.dp),
         ) {
@@ -329,7 +336,7 @@ private fun TesterPanel(
             Text(stringResource(R.string.testing_camera_button), style = MaterialTheme.typography.labelLarge)
         }
         Button(
-            onClick = onGalleryClick,
+            onClick = { haptic(); onGalleryClick() },
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
@@ -347,7 +354,7 @@ private fun TesterPanel(
 @Composable
 private fun PredictionResultCard(prediction: ClassifierPrediction) {
     val isConfident = prediction.confidence > 0.6
-    val mascotEmoji = if (isConfident) "🤖" else "🤔"
+    val mascotState = if (isConfident) MascotState.HAPPY else MascotState.CONFUSED
     val labelColor = if (isConfident) PrimaryPurple else Warning
 
     Card(
@@ -364,11 +371,11 @@ private fun PredictionResultCard(prediction: ClassifierPrediction) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(40.dp))
+                    .clip(CircleShape)
                     .background(Brush.linearGradient(listOf(PrimaryPurple, AccentBlue))),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(mascotEmoji, style = MaterialTheme.typography.headlineLarge)
+                Mascot(state = mascotState, size = 70.dp)
             }
             Text(
                 text = stringResource(R.string.testing_result_label),
@@ -385,6 +392,37 @@ private fun PredictionResultCard(prediction: ClassifierPrediction) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+
+            // Per-class breakdown — mirrors iOS explainability
+            if (prediction.allScores.size > 1) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Cât de sigur e botul:",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                val sorted = prediction.allScores.entries.sortedByDescending { it.value }
+                sorted.forEach { (label, score) ->
+                    val pct = (score * 100).toInt()
+                    val barColor = if (label == prediction.label) labelColor else MaterialTheme.colorScheme.onSurfaceVariant
+                    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(label, style = MaterialTheme.typography.bodySmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Medium))
+                            Text("$pct%", style = MaterialTheme.typography.bodySmall, color = barColor)
+                        }
+                        LinearProgressIndicator(
+                            progress = { score.toFloat().coerceIn(0f, 1f) },
+                            modifier = Modifier.fillMaxWidth().height(5.dp).clip(CircleShape),
+                            color = barColor,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    }
+                }
+            }
         }
     }
 }

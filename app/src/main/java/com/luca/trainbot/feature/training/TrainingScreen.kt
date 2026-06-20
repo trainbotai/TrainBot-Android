@@ -45,6 +45,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,11 +69,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import androidx.compose.foundation.shape.CircleShape
 import com.luca.trainbot.R
 import com.luca.trainbot.TrainBotApplication
 import com.luca.trainbot.core.ml.MlLabel
 import com.luca.trainbot.core.ml.MlProject
 import com.luca.trainbot.ui.components.CameraCapture
+import com.luca.trainbot.ui.components.ConfettiOverlay
+import com.luca.trainbot.ui.components.Mascot
+import com.luca.trainbot.ui.components.MascotState
+import com.luca.trainbot.ui.components.rememberHaptic
+import com.luca.trainbot.ui.components.rememberHapticConfirm
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.PrimaryPurple
 import com.luca.trainbot.ui.theme.Success
@@ -91,6 +98,7 @@ fun TrainingScreen() {
         ),
     )
     val state by vm.state.collectAsState()
+    val hapticConfirm = rememberHapticConfirm()
 
     val cameraPermission = rememberPermissionState(Manifest.permission.CAMERA)
 
@@ -99,6 +107,15 @@ fun TrainingScreen() {
     var showNewLabelDialog by remember { mutableStateOf(false) }
     var cameraTargetLabelId by remember { mutableStateOf<String?>(null) }
     var galleryTargetLabelId by remember { mutableStateOf<String?>(null) }
+    var showConfetti by remember { mutableStateOf(false) }
+
+    // Fire confetti + haptic when training completes
+    LaunchedEffect(state.lastAccuracy) {
+        if (state.lastAccuracy != null) {
+            hapticConfirm()
+            showConfetti = true
+        }
+    }
 
     // Gallery picker (multi-select, no permission needed on Android 13+)
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -133,46 +150,52 @@ fun TrainingScreen() {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Text(
-            text = stringResource(R.string.training_title),
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary,
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.training_title),
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
 
-        if (state.selectedProject == null) {
-            ProjectList(
-                projects = state.projects,
-                onSelectProject = { vm.selectProject(it.id) },
-                onNewProject = { showNewProjectDialog = true },
-            )
-        } else {
-            val project = state.selectedProject!!
-            ProjectEditor(
-                project = project,
-                state = state,
-                onBack = { vm.deselectProject() },
-                onNewLabel = { showNewLabelDialog = true },
-                onCameraClick = { labelId ->
-                    if (cameraPermission.status.isGranted) {
-                        cameraTargetLabelId = labelId
-                    } else {
-                        cameraPermission.launchPermissionRequest()
-                    }
-                },
-                onGalleryClick = { labelId ->
-                    galleryTargetLabelId = labelId
-                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                },
-                onTrain = { vm.train(project.id) },
-            )
+            if (state.selectedProject == null) {
+                ProjectList(
+                    projects = state.projects,
+                    onSelectProject = { vm.selectProject(it.id) },
+                    onNewProject = { showNewProjectDialog = true },
+                )
+            } else {
+                val project = state.selectedProject!!
+                ProjectEditor(
+                    project = project,
+                    state = state,
+                    onBack = { vm.deselectProject() },
+                    onNewLabel = { showNewLabelDialog = true },
+                    onCameraClick = { labelId ->
+                        if (cameraPermission.status.isGranted) {
+                            cameraTargetLabelId = labelId
+                        } else {
+                            cameraPermission.launchPermissionRequest()
+                        }
+                    },
+                    onGalleryClick = { labelId ->
+                        galleryTargetLabelId = labelId
+                        galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    },
+                    onTrain = { vm.train(project.id) },
+                )
+            }
+        }
+
+        if (showConfetti) {
+            ConfettiOverlay(onFinished = { showConfetti = false })
         }
     }
 
@@ -288,6 +311,7 @@ private fun ProjectEditor(
     onGalleryClick: (labelId: String) -> Unit,
     onTrain: () -> Unit,
 ) {
+    val haptic = rememberHaptic()
     // Back button row
     Row(verticalAlignment = Alignment.CenterVertically) {
         TextButton(onClick = onBack) {
@@ -348,7 +372,7 @@ private fun ProjectEditor(
         !state.isTraining
 
     Button(
-        onClick = onTrain,
+        onClick = { haptic(); onTrain() },
         modifier = Modifier.fillMaxWidth().height(56.dp),
         enabled = canTrain,
         shape = RoundedCornerShape(28.dp),
@@ -443,15 +467,15 @@ private fun TrainingProgressCard(message: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Mascot placeholder: gradient circle with brain emoji (mirrors iOS MascotView learning state)
+            // Mascot learning state
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(40.dp))
+                    .clip(CircleShape)
                     .background(Brush.linearGradient(listOf(PrimaryPurple, AccentBlue))),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("🧠", style = MaterialTheme.typography.headlineLarge)
+                Mascot(state = MascotState.LEARNING, size = 70.dp)
             }
             Text(
                 text = stringResource(R.string.training_training_in_progress),
@@ -489,11 +513,11 @@ private fun TrainedResultCard(accuracy: Double) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(40.dp))
+                    .clip(CircleShape)
                     .background(Brush.linearGradient(listOf(PrimaryPurple, AccentBlue))),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("🤖", style = MaterialTheme.typography.headlineLarge)
+                Mascot(state = MascotState.HAPPY, size = 70.dp)
             }
             Text(
                 text = stringResource(R.string.training_bot_learned, (accuracy * 100).toInt()),

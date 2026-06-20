@@ -57,6 +57,8 @@ import com.luca.trainbot.core.network.LlmStreamingRepository
 import com.luca.trainbot.feature.achievements.AchievementsStore
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.Danger
+import com.luca.trainbot.ui.components.Mascot
+import com.luca.trainbot.ui.components.MascotState
 import com.luca.trainbot.ui.theme.PrimaryPurple
 import com.luca.trainbot.ui.theme.SecondaryPurple
 import com.luca.trainbot.ui.theme.SurfaceLight
@@ -262,7 +264,7 @@ private fun MessageBubble(text: String, isUser: Boolean, flagged: Boolean) {
                     .background(Brush.linearGradient(listOf(PrimaryPurple, AccentBlue))),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = "🤖", style = MaterialTheme.typography.bodySmall)
+                Mascot(state = MascotState.IDLE, size = 28.dp)
             }
             Spacer(modifier = Modifier.width(6.dp))
         }

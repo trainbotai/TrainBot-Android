@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Card
@@ -42,6 +43,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.luca.trainbot.R
+import com.luca.trainbot.ui.components.Mascot
+import com.luca.trainbot.ui.components.MascotState
 import com.luca.trainbot.ui.navigation.Routes
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.PrimaryPurple
@@ -116,7 +119,7 @@ private fun MascotCard() {
             modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Mascot placeholder — gradient circle with robot emoji until real asset lands
+            // Real mascot — idle state
             Box(
                 modifier = Modifier
                     .size(72.dp)
@@ -126,7 +129,7 @@ private fun MascotCard() {
                     ),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = "🤖", style = MaterialTheme.typography.headlineLarge)
+                Mascot(state = MascotState.IDLE, size = 64.dp)
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
@@ -184,6 +187,12 @@ private fun FeatureCards(onNavigate: (String) -> Unit) {
             subtitle = stringResource(R.string.nav_achievements_subtitle),
             icon = Icons.Default.EmojiEvents,
             onClick = { onNavigate(Routes.ACHIEVEMENTS) },
+        )
+        NavigationCard(
+            title = "De ce greșește AI-ul?",
+            subtitle = "Descoperă limitele AI și înțelege ce e bias-ul. Lecție interactivă!",
+            icon = Icons.Default.QuestionMark,
+            onClick = { onNavigate(Routes.BIAS_LESSON) },
         )
     }
 }

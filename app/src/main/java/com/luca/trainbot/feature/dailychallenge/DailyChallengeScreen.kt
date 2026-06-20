@@ -29,6 +29,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.luca.trainbot.ui.components.Mascot
+import com.luca.trainbot.ui.components.MascotState
 import com.luca.trainbot.ui.theme.AccentBlue
 import com.luca.trainbot.ui.theme.PrimaryPurple
 import com.luca.trainbot.ui.theme.Success
@@ -62,7 +64,7 @@ fun DailyChallengeScreen(dailyChallengeStore: DailyChallengeStore) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Mascot circle — mirrors iOS MascotView
+        // Mascot circle — real Mascot component
         Box(
             modifier = Modifier
                 .size(120.dp)
@@ -77,9 +79,9 @@ fun DailyChallengeScreen(dailyChallengeStore: DailyChallengeStore) {
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = if (challenge?.completed == true) "🎉" else "🤖",
-                style = MaterialTheme.typography.displayLarge,
+            Mascot(
+                state = if (challenge?.completed == true) MascotState.HAPPY else MascotState.IDLE,
+                size = 110.dp,
             )
         }
 

@@ -74,4 +74,12 @@ val ALL_ACHIEVEMENTS = listOf(
         emoji = "⭐",
         target = 5,
     ),
+    AchievementDefinition(
+        id = "bias_lesson",
+        title = "Detectiv AI",
+        description = "Ai descoperit limitele AI-ului! Ai completat lecția despre bias.",
+        icon = "psychology_alt",
+        emoji = "🕵️",
+        target = 1,
+    ),
 )
