@@ -33,6 +33,11 @@ class TokenRefreshAuthenticator(
     private val refreshApiService: AuthApiService,
 ) : Authenticator {
 
+    // Un singur refresh la un moment dat: două 401-uri concurente ar trimite
+    // două POST /auth/refresh cu același token — al doilea pică la rotire și
+    // ar curăța TokenStore, delogând copilul forțat.
+    private val refreshLock = Any()
+
     override fun authenticate(route: Route?, response: Response): Request? {
         // Guard: if the response is already to a /auth/refresh call, don't recurse.
         if (response.request.url.encodedPath.contains("/auth/refresh")) {
@@ -48,10 +53,22 @@ class TokenRefreshAuthenticator(
             return null
         }
 
-        return runBlocking {
+        return synchronized(refreshLock) {
+            runBlocking {
             val state = tokenStore.authStateFlow.first()
-            val refreshToken = (state as? AuthState.Authenticated)?.refreshToken
+            val authState = state as? AuthState.Authenticated
                 ?: return@runBlocking null // no stored refresh token → stay unauthenticated
+
+            // Alt request a terminat refresh-ul cât am așteptat lock-ul? Atunci
+            // token-ul curent diferă de cel respins cu 401 — îl refolosim direct.
+            val failedToken = response.request.header("Authorization")?.removePrefix("Bearer ")
+            if (failedToken != null && failedToken != authState.accessToken) {
+                Log.d(TAG, "Token already refreshed by a concurrent request — reusing it")
+                return@runBlocking response.request.newBuilder()
+                    .header("Authorization", "Bearer ${authState.accessToken}")
+                    .build()
+            }
+            val refreshToken = authState.refreshToken
 
             Log.d(TAG, "Attempting token refresh…")
             val result = safeApiCall {
@@ -62,14 +79,13 @@ class TokenRefreshAuthenticator(
                 is ApiResult.Success -> {
                     val r = result.data
                     // Preserve user info fields from the current auth state.
-                    val currentState = state
                     tokenStore.saveTokens(
                         accessToken = r.accessToken,
                         refreshToken = r.refreshToken,
-                        userId = currentState.userId,
-                        userRole = currentState.userRole,
-                        userName = currentState.userName,
-                        tenantId = currentState.tenantId,
+                        userId = authState.userId,
+                        userRole = authState.userRole,
+                        userName = authState.userName,
+                        tenantId = authState.tenantId,
                     )
                     Log.d(TAG, "Token refreshed successfully — retrying request")
                     response.request.newBuilder()
@@ -81,6 +97,7 @@ class TokenRefreshAuthenticator(
                     tokenStore.clear()
                     null
                 }
+            }
             }
         }
     }

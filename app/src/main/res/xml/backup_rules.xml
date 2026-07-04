@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- API < 31 (fullBackupContent): aceeași excludere ca data_extraction_rules.xml. -->
+<full-backup-content>
+    <exclude domain="file" path="datastore/trainbot_auth.preferences_pb" />
+</full-backup-content>

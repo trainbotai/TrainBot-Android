@@ -31,9 +31,9 @@ class MlSyncService(private val mlApiService: MlApiService) {
         runCatching {
             val request = buildRequest(project)
             mlApiService.syncProject(request)
-            Log.d(TAG, "Synced project '${project.name}' (clientId=${project.id})")
+            Log.d(TAG, "Synced project clientId=${project.id}")
         }.onFailure { e ->
-            Log.w(TAG, "ML sync failed for project '${project.name}': ${e.message}")
+            Log.w(TAG, "ML sync failed for project clientId=${project.id}: ${e.message}")
         }
     }
 

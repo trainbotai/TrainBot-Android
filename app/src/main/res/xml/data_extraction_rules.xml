@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- API 31+: exclude token-urile din cloud backup și transfer device-to-device.
+     Valorile sunt oricum criptate cu cheie Keystore (netransferabilă), dar
+     excluderea evită complet exfiltrarea fișierului. Proiectele ML ale copilului
+     (files/, projects.json) rămân incluse în backup. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="datastore/trainbot_auth.preferences_pb" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore/trainbot_auth.preferences_pb" />
+    </device-transfer>
+</data-extraction-rules>

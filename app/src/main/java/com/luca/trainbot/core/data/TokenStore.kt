@@ -12,8 +12,9 @@ import kotlinx.coroutines.flow.map
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "trainbot_auth")
 
 /**
- * Persists auth tokens in Jetpack DataStore (Preferences).
- * Mirrors iOS KeychainHelper — stores accessToken, refreshToken, and user info.
+ * Persists auth tokens in Jetpack DataStore (Preferences), encrypted at rest
+ * with an Android Keystore key (see [TokenCrypto]) — DataStore alone is
+ * plain-text and would otherwise leak tokens via Auto Backup / adb backup.
  */
 class TokenStore(private val context: Context) {
 
@@ -26,21 +27,25 @@ class TokenStore(private val context: Context) {
         private val KEY_TENANT_ID = stringPreferencesKey("tenant_id")
     }
 
+    private fun Preferences.decrypted(key: Preferences.Key<String>): String? =
+        this[key]?.let { TokenCrypto.decrypt(it) }
+
     val accessTokenFlow: Flow<String?> = context.dataStore.data
-        .map { it[KEY_ACCESS_TOKEN] }
+        .map { it.decrypted(KEY_ACCESS_TOKEN) }
 
     val authStateFlow: Flow<AuthState> = context.dataStore.data.map { prefs ->
-        val token = prefs[KEY_ACCESS_TOKEN]
+        val token = prefs.decrypted(KEY_ACCESS_TOKEN)
         if (token != null) {
             AuthState.Authenticated(
                 accessToken = token,
-                refreshToken = prefs[KEY_REFRESH_TOKEN] ?: "",
-                userId = prefs[KEY_USER_ID] ?: "",
-                userRole = prefs[KEY_USER_ROLE] ?: "",
-                userName = prefs[KEY_USER_NAME] ?: "",
-                tenantId = prefs[KEY_TENANT_ID] ?: "",
+                refreshToken = prefs.decrypted(KEY_REFRESH_TOKEN) ?: "",
+                userId = prefs.decrypted(KEY_USER_ID) ?: "",
+                userRole = prefs.decrypted(KEY_USER_ROLE) ?: "",
+                userName = prefs.decrypted(KEY_USER_NAME) ?: "",
+                tenantId = prefs.decrypted(KEY_TENANT_ID) ?: "",
             )
         } else {
+            // token lipsă SAU nedecriptabil (ex. restore pe alt device) → re-login
             AuthState.Unauthenticated
         }
     }
@@ -54,12 +59,12 @@ class TokenStore(private val context: Context) {
         tenantId: String,
     ) {
         context.dataStore.edit { prefs ->
-            prefs[KEY_ACCESS_TOKEN] = accessToken
-            prefs[KEY_REFRESH_TOKEN] = refreshToken
-            prefs[KEY_USER_ID] = userId
-            prefs[KEY_USER_ROLE] = userRole
-            prefs[KEY_USER_NAME] = userName
-            prefs[KEY_TENANT_ID] = tenantId
+            prefs[KEY_ACCESS_TOKEN] = TokenCrypto.encrypt(accessToken)
+            prefs[KEY_REFRESH_TOKEN] = TokenCrypto.encrypt(refreshToken)
+            prefs[KEY_USER_ID] = TokenCrypto.encrypt(userId)
+            prefs[KEY_USER_ROLE] = TokenCrypto.encrypt(userRole)
+            prefs[KEY_USER_NAME] = TokenCrypto.encrypt(userName)
+            prefs[KEY_TENANT_ID] = TokenCrypto.encrypt(tenantId)
         }
     }
 
