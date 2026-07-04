@@ -24,6 +24,9 @@ import com.luca.trainbot.feature.achievements.AchievementsScreen
 import com.luca.trainbot.feature.achievements.AchievementsStore
 import com.luca.trainbot.feature.auth.StudentLoginScreen
 import com.luca.trainbot.feature.biaslesson.BiasLessonScreen
+import com.luca.trainbot.feature.lessons.LessonsLibraryScreen
+import com.luca.trainbot.feature.lessons.RealBotLessonScreen
+import com.luca.trainbot.feature.lessons.RealTrainingLessonScreen
 import com.luca.trainbot.feature.dailychallenge.DailyChallengeScreen
 import com.luca.trainbot.feature.dailychallenge.DailyChallengeStore
 import com.luca.trainbot.feature.home.HomeScreen
@@ -48,6 +51,9 @@ object Routes {
     const val ACHIEVEMENTS = "achievements"
     const val DAILY_CHALLENGE = "daily_challenge"
     const val BIAS_LESSON = "bias_lesson"
+    const val LESSONS_LIBRARY = "lessons_library"
+    const val LESSON_REAL_TRAINING = "lesson_real_training"
+    const val LESSON_REAL_BOT = "lesson_real_bot"
 }
 
 @Composable
@@ -163,6 +169,35 @@ fun TrainBotNavGraph(
         composable(Routes.BIAS_LESSON) {
             BiasLessonScreen(
                 achievementsStore = achievementsStore,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(Routes.LESSONS_LIBRARY) {
+            LessonsLibraryScreen(
+                achievementsStore = achievementsStore,
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(Routes.LESSON_REAL_TRAINING) {
+            RealTrainingLessonScreen(
+                achievementsStore = achievementsStore,
+                onNavigateToTraining = {
+                    navController.navigate(Routes.TRAINING) {
+                        popUpTo(Routes.LESSON_REAL_TRAINING) { inclusive = true }
+                    }
+                },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(Routes.LESSON_REAL_BOT) {
+            RealBotLessonScreen(
+                achievementsStore = achievementsStore,
+                onNavigateToLlm = {
+                    navController.navigate(Routes.LLM) {
+                        popUpTo(Routes.LESSON_REAL_BOT) { inclusive = true }
+                    }
+                },
                 onBack = { navController.popBackStack() },
             )
         }

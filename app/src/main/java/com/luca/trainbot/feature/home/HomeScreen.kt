@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
@@ -196,10 +195,10 @@ private fun FeatureCards(onNavigate: (String) -> Unit) {
             onClick = { onNavigate(Routes.ACHIEVEMENTS) },
         )
         NavigationCard(
-            title = "De ce greșește AI-ul?",
-            subtitle = "Descoperă limitele AI și înțelege ce e bias-ul. Lecție interactivă!",
-            icon = Icons.Default.QuestionMark,
-            onClick = { onNavigate(Routes.BIAS_LESSON) },
+            title = "Lecții AI",
+            subtitle = "Învață AI-ul pas cu pas, cu mâna ta",
+            icon = Icons.Default.School,
+            onClick = { onNavigate(Routes.LESSONS_LIBRARY) },
         )
     }
 }

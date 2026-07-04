@@ -82,4 +82,20 @@ val ALL_ACHIEVEMENTS = listOf(
         emoji = "🕵️",
         target = 1,
     ),
+    AchievementDefinition(
+        id = "primul_model",
+        title = "Primul model",
+        description = "Ai pornit prima ta lecție de antrenare AI!",
+        icon = "model_training",
+        emoji = "🤖",
+        target = 1,
+    ),
+    AchievementDefinition(
+        id = "creator_de_boti",
+        title = "Creator de boți",
+        description = "Ai pornit prima ta lecție de creare a unui bot AI!",
+        icon = "smart_toy",
+        emoji = "✨",
+        target = 1,
+    ),
 )
