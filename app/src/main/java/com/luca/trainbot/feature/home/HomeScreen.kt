@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.QuestionMark
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Card
@@ -163,6 +164,12 @@ private fun FeatureCards(onNavigate: (String) -> Unit) {
             subtitle = stringResource(R.string.nav_llm_subtitle),
             icon = Icons.Default.Chat,
             onClick = { onNavigate(Routes.LLM) },
+        )
+        NavigationCard(
+            title = "Boții profesorului",
+            subtitle = "Vorbește cu boții AI făcuți de profesorul tău",
+            icon = Icons.Default.School,
+            onClick = { onNavigate(Routes.TEACHER_BOTS) },
         )
         NavigationCard(
             title = stringResource(R.string.nav_testing_title),

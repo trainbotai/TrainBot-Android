@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.boolean
@@ -44,17 +43,27 @@ class LlmStreamingRepository(
     private val json = Json { ignoreUnknownKeys = true }
 
     /**
+     * Returns a cold [Flow] of [SseEvent]s for a teacher bot query.
+     * POSTs to /student/llm/teacher-bots/{id}/query — same SSE shape as student session query.
+     */
+    fun streamTeacherBotQuery(botId: String, prompt: String): Flow<SseEvent> =
+        streamInternal("student/llm/teacher-bots/$botId/query", prompt)
+
+    /**
      * Returns a cold [Flow] of [SseEvent]s.
      * Throws [UnauthorizedException] or [HttpException] on error before streaming starts.
      * IO errors during streaming are propagated as Flow exceptions.
      */
-    fun streamQuery(sessionId: String, prompt: String): Flow<SseEvent> = flow {
+    fun streamQuery(sessionId: String, prompt: String): Flow<SseEvent> =
+        streamInternal("student/llm/sessions/$sessionId/query", prompt)
+
+    private fun streamInternal(path: String, prompt: String): Flow<SseEvent> = flow {
         val token = tokenProvider()
             ?: throw UnauthorizedException()
 
         // BASE_URL ends with "/" (e.g. "http://10.0.2.2:3000/api/v1/")
         val base = BuildConfig.BASE_URL.trimEnd('/')
-        val url = "$base/student/llm/sessions/$sessionId/query"
+        val url = "$base/$path"
 
         // Encode prompt as JSON body
         val bodyBytes = buildJsonBody(prompt)

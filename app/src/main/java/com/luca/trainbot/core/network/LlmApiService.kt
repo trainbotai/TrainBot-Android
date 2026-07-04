@@ -57,4 +57,8 @@ interface LlmApiService {
     /** GET /student/llm/quota */
     @GET("student/llm/quota")
     suspend fun getQuota(): QueryQuota
+
+    /** GET /student/llm/teacher-bots */
+    @GET("student/llm/teacher-bots")
+    suspend fun listTeacherBots(): TeacherBotListResponse
 }

@@ -113,3 +113,17 @@ data class ReportSessionRequest(
 data class ReportSessionResponse(
     val reportId: String,
 )
+
+// ---- Teacher bots ----
+
+@Serializable
+data class TeacherBot(
+    val id: String,
+    val name: String,
+    val teacherName: String,
+)
+
+@Serializable
+data class TeacherBotListResponse(
+    val bots: List<TeacherBot>,
+)

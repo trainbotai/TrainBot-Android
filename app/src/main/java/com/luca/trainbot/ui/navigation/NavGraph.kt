@@ -29,6 +29,7 @@ import com.luca.trainbot.feature.dailychallenge.DailyChallengeStore
 import com.luca.trainbot.feature.home.HomeScreen
 import com.luca.trainbot.feature.knowledge.KnowledgeScreen
 import com.luca.trainbot.feature.llm.LlmScreen
+import com.luca.trainbot.feature.llm.teacherbots.TeacherBotsScreen
 import com.luca.trainbot.feature.onboarding.OnboardingScreen
 import com.luca.trainbot.feature.settings.SettingsScreen
 import com.luca.trainbot.feature.testing.TestingScreen
@@ -41,6 +42,7 @@ object Routes {
     const val TRAINING = "training"
     const val TESTING = "testing"
     const val LLM = "llm"
+    const val TEACHER_BOTS = "teacher_bots"
     const val KNOWLEDGE = "knowledge"
     const val SETTINGS = "settings"
     const val ACHIEVEMENTS = "achievements"
@@ -161,6 +163,13 @@ fun TrainBotNavGraph(
         composable(Routes.BIAS_LESSON) {
             BiasLessonScreen(
                 achievementsStore = achievementsStore,
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable(Routes.TEACHER_BOTS) {
+            TeacherBotsScreen(
+                llmRepository = llmRepository,
+                llmStreamingRepository = llmStreamingRepository,
                 onBack = { navController.popBackStack() },
             )
         }

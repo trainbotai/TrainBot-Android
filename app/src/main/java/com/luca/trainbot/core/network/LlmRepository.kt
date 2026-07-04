@@ -46,4 +46,7 @@ class LlmRepository(private val api: LlmApiService) {
 
     suspend fun getQuota(): ApiResult<QueryQuota> =
         safeApiCall { api.getQuota() }
+
+    suspend fun listTeacherBots(): ApiResult<List<TeacherBot>> =
+        safeApiCall { api.listTeacherBots().bots }
 }
