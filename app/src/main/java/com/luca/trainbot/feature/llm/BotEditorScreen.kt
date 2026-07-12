@@ -40,6 +40,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * Sheet-style editor for creating a new bot or adding a version to an existing one.
@@ -53,7 +54,10 @@ fun BotEditorScreen(
     onDismiss: () -> Unit,
     onSaved: () -> Unit,
 ) {
-    val vm = remember(editing) { BotEditorViewModel(repo, editing) }
+    val vm: BotEditorViewModel = viewModel(
+        key = editing?.id,
+        factory = BotEditorViewModel.Factory(repo, editing),
+    )
     val title = if (editing == null) "Bot nou" else "Editeaza ${editing.name}"
 
     Scaffold(
@@ -80,7 +84,7 @@ fun BotEditorScreen(
             OutlinedTextField(
                 value = vm.name,
                 onValueChange = { vm.name = it },
-                placeholder = { Text("Numele botului tau") },
+                placeholder = { Text("Numele botului tău") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -100,7 +104,7 @@ fun BotEditorScreen(
 
             if (vm.canAddExample) {
                 TextButton(onClick = { vm.addExample() }) {
-                    Text("+ Adauga exemplu", color = MaterialTheme.colorScheme.primary)
+                    Text("+ Adaugă exemplu", color = MaterialTheme.colorScheme.primary)
                 }
             }
 
@@ -135,8 +139,8 @@ fun BotEditorScreen(
                 Text(
                     text = when {
                         vm.isSaving -> "Se salveaza..."
-                        editing == null -> "Creeaza bot"
-                        else -> "Salveaza versiune noua"
+                        editing == null -> "Creează bot"
+                        else -> "Salvează versiune nouă"
                     },
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.White,
@@ -185,7 +189,7 @@ private fun ExamplePairCard(
                 IconButton(onClick = onDelete) {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = "Sterge exemplu",
+                        contentDescription = "Șterge exemplu",
                         tint = Danger,
                     )
                 }
@@ -201,7 +205,7 @@ private fun ExamplePairCard(
             OutlinedTextField(
                 value = entry.ai,
                 onValueChange = onAiChange,
-                label = { Text("Raspuns bot") },
+                label = { Text("Răspuns bot") },
                 modifier = Modifier.fillMaxWidth(),
                 maxLines = 3,
                 shape = RoundedCornerShape(8.dp),

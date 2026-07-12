@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.luca.trainbot.core.network.ApiResult
 import com.luca.trainbot.core.network.ChatHistoryItem
@@ -66,7 +67,7 @@ class TeacherBotChatViewModel(
                 streaming.streamTeacherBotQuery(botId, prompt)
                     .catch { e ->
                         val msg = when (e) {
-                            is UnauthorizedException -> "Sesiunea ta a expirat. Reconecteaza-te."
+                            is UnauthorizedException -> "Sesiunea ta a expirat. Reconectează-te."
                             is HttpException -> e.detail
                             else -> "Eroare la trimitere."
                         }
@@ -101,7 +102,7 @@ class TeacherBotChatViewModel(
                 val qr = repo.getQuota()
                 if (qr is ApiResult.Success) quota = qr.data
             } catch (e: UnauthorizedException) {
-                errorMessage = "Sesiunea ta a expirat. Reconecteaza-te."
+                errorMessage = "Sesiunea ta a expirat. Reconectează-te."
                 pendingMessage = null
             } catch (e: HttpException) {
                 errorMessage = e.detail
@@ -112,4 +113,16 @@ class TeacherBotChatViewModel(
             }
         }
     }
+
+    class Factory(
+        private val botId: String,
+        private val botName: String,
+        private val repo: LlmRepository,
+        private val streaming: LlmStreamingRepository,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T =
+            TeacherBotChatViewModel(botId, botName, repo, streaming) as T
+    }
+
 }

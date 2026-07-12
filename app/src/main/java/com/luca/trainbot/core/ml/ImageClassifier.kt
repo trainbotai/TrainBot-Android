@@ -19,6 +19,7 @@ class ImageClassifier(context: Context) {
     companion object {
         const val MIN_LABELS = 2
         const val MIN_IMAGES_PER_LABEL = 3
+        private const val SOFTMAX_TEMPERATURE = 0.08
     }
 
     // ── Training ─────────────────────────────────────────────────────────────
@@ -51,7 +52,8 @@ class ImageClassifier(context: Context) {
         val totalImages = labels.sumOf { it.imageFileNames.size }
         var processed = 0
 
-        val trainedLabels = labels.map { label ->
+        // Păstrăm embeddings per etichetă ca să calculăm acuratețea leave-one-out.
+        val labelEmbeddings = labels.map { label ->
             val embeddings = label.imageFileNames.mapNotNull { filename ->
                 val bmp = repository.loadBitmap(project.id, label.id, filename)
                 val emb = bmp?.let { embedder.embed(it) }
@@ -59,13 +61,16 @@ class ImageClassifier(context: Context) {
                 onProgress(TrainProgress.Computing(processed, totalImages))
                 emb
             }
-            val centroid = computeCentroid(embeddings)
-            label.copy(centroid = centroid.toList())
+            label to embeddings
+        }
+
+        val trainedLabels = labelEmbeddings.map { (label, embeddings) ->
+            label.copy(centroid = computeCentroid(embeddings).toList())
         }
 
         onProgress(TrainProgress.Saving)
 
-        val accuracy = computeTrainingAccuracy(project, trainedLabels, repository)
+        val accuracy = computeLeaveOneOutAccuracy(labelEmbeddings)
 
         return project.copy(
             labels = trainedLabels,
@@ -115,8 +120,11 @@ class ImageClassifier(context: Context) {
         return centroid
     }
 
+    // Similaritățile cosine sunt în [-1,1]; softmax direct comprimă încrederea
+    // (un match perfect cu 2 clase afișa ~66%). Împărțim la o temperatură ca să
+    // separăm scorurile înainte de softmax.
     private fun softmax(scores: Map<MlLabel, Double>): Map<MlLabel, Double> {
-        val values = scores.values.toList()
+        val values = scores.values.map { it / SOFTMAX_TEMPERATURE }
         val maxVal = values.maxOrNull() ?: 0.0
         val exps = values.map { exp(it - maxVal) }
         val sum = exps.sum()
@@ -124,18 +132,31 @@ class ImageClassifier(context: Context) {
         return keys.zip(exps.map { it / sum }).toMap()
     }
 
-    private fun computeTrainingAccuracy(
-        project: MlProject,
-        trainedLabels: List<MlLabel>,
-        repository: MlProjectRepository,
+    /**
+     * Acuratețe leave-one-out: pentru fiecare imagine, recalculăm centroidul
+     * clasei ei FĂRĂ acea imagine, apoi o clasificăm. Evită „100% mereu" al
+     * evaluării pe setul de antrenare (care e și anti-pedagogic în aplicație).
+     */
+    private fun computeLeaveOneOutAccuracy(
+        labelEmbeddings: List<Pair<MlLabel, List<FloatArray>>>,
     ): Double {
+        val fullCentroids = labelEmbeddings.associate { (label, embs) ->
+            label to computeCentroid(embs)
+        }
         var correct = 0; var total = 0
-        val tempProject = project.copy(labels = trainedLabels, isTrained = true)
-        for (label in trainedLabels) {
-            for (filename in label.imageFileNames) {
-                val bmp = repository.loadBitmap(project.id, label.id, filename) ?: continue
-                val pred = predict(bmp, tempProject) ?: continue
-                if (pred.label == label.name) correct++
+        for ((label, embs) in labelEmbeddings) {
+            if (embs.size < 2) continue // fără hold-out posibil cu <2 poze
+            for (heldOut in embs) {
+                val trainCentroid = computeCentroid(embs.filter { it !== heldOut })
+                var bestLabel: MlLabel? = null
+                var bestSim = Double.NEGATIVE_INFINITY
+                for ((other, otherEmbs) in labelEmbeddings) {
+                    val centroid = if (other === label) trainCentroid else fullCentroids.getValue(other)
+                    if (centroid.isEmpty()) continue
+                    val sim = embedder.cosineSimilarity(heldOut, centroid)
+                    if (sim > bestSim) { bestSim = sim; bestLabel = other }
+                }
+                if (bestLabel === label) correct++
                 total++
             }
         }

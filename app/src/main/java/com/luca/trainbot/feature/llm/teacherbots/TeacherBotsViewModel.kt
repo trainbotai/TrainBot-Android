@@ -1,6 +1,7 @@
 package com.luca.trainbot.feature.llm.teacherbots
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.luca.trainbot.core.network.ApiResult
 import com.luca.trainbot.core.network.LlmRepository
@@ -40,4 +41,11 @@ class TeacherBotsViewModel(private val repo: LlmRepository) : ViewModel() {
             _isLoading.value = false
         }
     }
+
+    class Factory(private val repo: LlmRepository) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T =
+            TeacherBotsViewModel(repo) as T
+    }
+
 }

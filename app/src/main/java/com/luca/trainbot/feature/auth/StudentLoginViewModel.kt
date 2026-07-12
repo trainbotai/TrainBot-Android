@@ -1,6 +1,7 @@
 package com.luca.trainbot.feature.auth
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.luca.trainbot.core.data.AuthRepository
 import com.luca.trainbot.core.network.ApiResult
@@ -51,4 +52,11 @@ class StudentLoginViewModel(
             }
         }
     }
+
+    class Factory(private val authRepository: AuthRepository) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T =
+            StudentLoginViewModel(authRepository) as T
+    }
+
 }

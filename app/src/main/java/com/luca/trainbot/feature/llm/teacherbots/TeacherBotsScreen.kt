@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luca.trainbot.core.network.ChatHistoryItem
 import com.luca.trainbot.core.network.LlmRepository
 import com.luca.trainbot.core.network.LlmStreamingRepository
@@ -82,7 +83,7 @@ fun TeacherBotsScreen(
     llmStreamingRepository: LlmStreamingRepository,
     onBack: () -> Unit,
 ) {
-    val listVm = remember { TeacherBotsViewModel(llmRepository) }
+    val listVm: TeacherBotsViewModel = viewModel(factory = TeacherBotsViewModel.Factory(llmRepository))
     var subScreen by remember { mutableStateOf<TeacherBotSubScreen>(TeacherBotSubScreen.List) }
 
     when (val s = subScreen) {
@@ -127,7 +128,7 @@ private fun TeacherBotListScreen(
                 title = { Text("Boții profesorului") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Inapoi")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi")
                     }
                 },
             )
@@ -159,7 +160,7 @@ private fun TeacherBotListScreen(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         TextButton(onClick = { vm.load() }) {
-                            Text("Reincearca", color = MaterialTheme.colorScheme.primary)
+                            Text("Reîncearcă", color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
@@ -279,9 +280,10 @@ private fun TeacherBotChatScreen(
     llmStreamingRepository: LlmStreamingRepository,
     onBack: () -> Unit,
 ) {
-    val vm = remember(botId) {
-        TeacherBotChatViewModel(botId, botName, llmRepository, llmStreamingRepository)
-    }
+    val vm: TeacherBotChatViewModel = viewModel(
+        key = botId,
+        factory = TeacherBotChatViewModel.Factory(botId, botName, llmRepository, llmStreamingRepository),
+    )
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
@@ -300,7 +302,7 @@ private fun TeacherBotChatScreen(
                 title = { Text(botName, maxLines = 1) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Inapoi")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi")
                     }
                 },
             )
@@ -383,7 +385,7 @@ private fun TeacherBotChatScreen(
                 TeacherBotMessageBubble(text = item.userPrompt, isUser = true)
                 Spacer(modifier = Modifier.height(4.dp))
                 TeacherBotMessageBubble(
-                    text = if (item.flagged) "Mesajul tau nu poate fi procesat. Incearca alt subiect." else item.aiResponse,
+                    text = if (item.flagged) "Mesajul tău nu poate fi procesat. Încearcă alt subiect." else item.aiResponse,
                     isUser = false,
                 )
             }

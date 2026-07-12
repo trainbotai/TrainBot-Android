@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luca.trainbot.core.network.LlmRepository
 import com.luca.trainbot.core.network.LlmStreamingRepository
 import com.luca.trainbot.core.network.QueryQuota
@@ -57,7 +58,7 @@ import com.luca.trainbot.ui.theme.PrimaryPurple
 import com.luca.trainbot.ui.theme.SecondaryPurple
 
 /**
- * Entry point for "AI-ul tau" — the LLM bot list.
+ * Entry point for "AI-ul tău" — the LLM bot list.
  * Manages navigation sub-state internally (list → editor / chat).
  * Mirrors iOS BotListView.
  */
@@ -68,7 +69,7 @@ fun LlmScreen(
     achievementsStore: AchievementsStore,
     onBack: (() -> Unit)? = null,
 ) {
-    val vm = remember { BotListViewModel(llmRepository) }
+    val vm: BotListViewModel = viewModel(factory = BotListViewModel.Factory(llmRepository))
     var screen by remember { mutableStateOf<LlmSubScreen>(LlmSubScreen.List) }
 
     when (val s = screen) {
@@ -128,11 +129,11 @@ private fun BotListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("AI-ul tau") },
+                title = { Text("AI-ul tău") },
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Inapoi")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi")
                         }
                     }
                 },
@@ -170,7 +171,7 @@ private fun BotListScreen(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         TextButton(onClick = { vm.load() }) {
-                            Text("Reincearca", color = MaterialTheme.colorScheme.primary)
+                            Text("Reîncearcă", color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
@@ -290,12 +291,12 @@ private fun EmptyBotState() {
             Mascot(state = MascotState.IDLE, size = 70.dp)
         }
         Text(
-            text = "Niciun bot inca",
+            text = "Niciun bot încă",
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = "Creeaza primul tau bot AI daruindu-i exemple de cum sa raspunda.",
+            text = "Creează primul tău bot AI dăruindu-i exemple de cum să răspundă.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 24.dp),

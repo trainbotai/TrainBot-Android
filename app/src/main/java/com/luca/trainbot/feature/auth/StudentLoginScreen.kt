@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luca.trainbot.R
 import com.luca.trainbot.core.data.AuthRepository
 import com.luca.trainbot.ui.components.Mascot
@@ -50,7 +51,7 @@ fun StudentLoginScreen(
     authRepository: AuthRepository,
     onLoginSuccess: () -> Unit,
 ) {
-    val viewModel = remember { StudentLoginViewModel(authRepository) }
+    val viewModel: StudentLoginViewModel = viewModel(factory = StudentLoginViewModel.Factory(authRepository))
     val state by viewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
 

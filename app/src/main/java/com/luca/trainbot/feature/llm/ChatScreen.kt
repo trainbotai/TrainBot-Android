@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luca.trainbot.core.network.LlmRepository
 import com.luca.trainbot.core.network.LlmStreamingRepository
 import com.luca.trainbot.feature.achievements.AchievementsStore
@@ -80,7 +81,10 @@ fun ChatScreen(
     achievementsStore: AchievementsStore,
     onBack: () -> Unit,
 ) {
-    val vm = remember(sessionId) { ChatViewModel(sessionId, sessionName, repo, streaming, achievementsStore) }
+    val vm: ChatViewModel = viewModel(
+        key = sessionId,
+        factory = ChatViewModel.Factory(sessionId, sessionName, repo, streaming, achievementsStore),
+    )
     var inputText by remember { mutableStateOf("") }
     var showReport by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
@@ -114,7 +118,7 @@ fun ChatScreen(
                 title = { Text(sessionName, maxLines = 1) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Inapoi")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi")
                     }
                 },
                 actions = {
@@ -207,7 +211,7 @@ fun ChatScreen(
                 MessageBubble(text = item.userPrompt, isUser = true, flagged = false)
                 Spacer(modifier = Modifier.height(4.dp))
                 MessageBubble(
-                    text = if (item.flagged) "Mesajul tau nu poate fi procesat. Incearca alt subiect." else item.aiResponse,
+                    text = if (item.flagged) "Mesajul tău nu poate fi procesat. Încearcă alt subiect." else item.aiResponse,
                     isUser = false,
                     flagged = item.flagged,
                 )

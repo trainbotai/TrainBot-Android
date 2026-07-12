@@ -66,7 +66,7 @@ private val TRAINING_STEPS = listOf(
     ),
     TrainingStep(
         mascotState = MascotState.THINKING,
-        mascotText = "Apasa Antreneaza si lasa AI-ul sa studieze pozele tale. Dureaza doar cateva secunde!",
+        mascotText = "Apasă Antrenează si lasă AI-ul sa studieze pozele tale. Durează doar câteva secunde!",
         stepContent = "AI-ul analizează toate pozele și găsește ce face fiecare obiect special. Acesta e momentul magic!",
         stepEmoji = "🧠",
     ),

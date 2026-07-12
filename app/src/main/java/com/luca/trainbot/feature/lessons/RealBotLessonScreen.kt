@@ -49,19 +49,19 @@ private val BOT_STEPS = listOf(
     BotLessonStep(
         mascotState = MascotState.HAPPY,
         mascotText = "Hai să-ți faci propriul bot AI! Îi dai exemple de întrebare→răspuns și învață să-ți răspundă.",
-        stepContent = "Un bot AI este un program care raspunde la intrebari. Tu ii arati cum sa raspunda, dandu-i exemple.",
+        stepContent = "Un bot AI este un program care raspunde la intrebari. Tu ii arati cum sa răspundă, dandu-i exemple.",
         stepEmoji = "🤖",
     ),
     BotLessonStep(
         mascotState = MascotState.LEARNING,
         mascotText = "Dă-i botului tău câteva exemple: scrie o întrebare și răspunsul corect. Cu cât mai multe, cu atât mai deștept!",
-        stepContent = "Exemplu: Intrebare: 'Buna ziua!' -> Raspuns: 'Buna! Cum te pot ajuta?'. Adauga 3-5 exemple ca sa inceapa sa invete.",
+        stepContent = "Exemplu: Întrebare: 'Bună ziua!' -> Raspuns: 'Bună! Cum te pot ajuta?'. Adaugă 3-5 exemple ca sa înceapă sa învețe.",
         stepEmoji = "💬",
     ),
     BotLessonStep(
         mascotState = MascotState.THINKING,
         mascotText = "Salvează botul și încearcă să conversezi cu el! Vei vedea cum răspunde folosind ce l-ai învățat tu.",
-        stepContent = "Apasa Salveaza si apoi Converseaza - botul tau e acum activ! Poti oricand sa-i adaugi mai multe exemple.",
+        stepContent = "Apasă Salveaza si apoi Converseaza - botul tau e acum activ! Poti oricand sa-i adaugi mai multe exemple.",
         stepEmoji = "✨",
     ),
 )

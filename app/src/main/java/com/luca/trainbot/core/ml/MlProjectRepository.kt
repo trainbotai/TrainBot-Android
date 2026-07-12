@@ -110,9 +110,7 @@ class MlProjectRepository(private val context: Context) {
 
     @Synchronized
     fun addImageFromUri(projectId: String, labelId: String, uri: Uri): MlProject {
-        val bitmap = context.contentResolver.openInputStream(uri)?.use { stream ->
-            BitmapFactory.decodeStream(stream)
-        } ?: error("Cannot decode image from URI")
+        val bitmap = decodeSampledFromUri(context, uri) ?: error("Cannot decode image from URI")
         return addImage(projectId, labelId, bitmap)
     }
 
@@ -133,7 +131,7 @@ class MlProjectRepository(private val context: Context) {
     }
 
     fun loadBitmap(projectId: String, labelId: String, filename: String): Bitmap? =
-        runCatching { BitmapFactory.decodeFile(imageFile(projectId, labelId, filename).absolutePath) }.getOrNull()
+        runCatching { decodeSampledFromFile(imageFile(projectId, labelId, filename).absolutePath) }.getOrNull()
 
     // ── Model (embeddings) persistence ───────────────────────────────────────
 

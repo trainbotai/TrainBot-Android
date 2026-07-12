@@ -76,9 +76,7 @@ class TestingViewModel(
     fun predictFromUri(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val bitmap = context.contentResolver.openInputStream(uri)?.use { stream ->
-                    android.graphics.BitmapFactory.decodeStream(stream)
-                } ?: return@runCatching
+                val bitmap = com.luca.trainbot.core.ml.decodeSampledFromUri(context, uri) ?: return@runCatching
                 withContext(Dispatchers.Main) { predictFromBitmap(bitmap) }
             }.onFailure { e ->
                 _state.update { it.copy(error = e.message) }

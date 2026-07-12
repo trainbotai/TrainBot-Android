@@ -88,7 +88,7 @@ class LlmStreamingRepository(
 
         val body = response.body ?: run {
             response.close()
-            throw IllegalStateException("Raspuns gol de la server")
+            throw IllegalStateException("Răspuns gol de la server")
         }
 
         try {
